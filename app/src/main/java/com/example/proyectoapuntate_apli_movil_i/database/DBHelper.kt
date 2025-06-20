@@ -116,6 +116,8 @@ class DBHelper(context: Context):SQLiteOpenHelper(context,"BdApuntes.db",null,1)
         db?.execSQL("DROP TABLE IF EXISTS $TABLE_LOGIN")
         db?.execSQL("DROP TABLE IF EXISTS $TABLE_CLIENTE")
         onCreate(db)
+
+
     }
 
     // MÉTODOS PARA CLIENTE
