@@ -1,5 +1,4 @@
 package com.example.proyectoapuntate_apli_movil_i
-
 import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,8 +11,8 @@ import java.util.*
 class TareasActivity : AppCompatActivity() {
     private lateinit var dbHelper: DBHelper
     private lateinit var tareasListView: ListView
-    private lateinit var adapter: ArrayAdapter<String>
-    private lateinit var tareas: List<Tarea>
+    private lateinit var adapter: TareaAdapter
+    private var tareas: MutableList<Tarea> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,33 +27,16 @@ class TareasActivity : AppCompatActivity() {
         btnAgregar.setOnClickListener {
             mostrarDialogoAgregar(null)
         }
-
-        // Click corto: editar
-        tareasListView.setOnItemClickListener { _, _, position, _ ->
-            val tarea = tareas[position]
-            mostrarDialogoAgregar(tarea)
-        }
-
-        // Click largo: eliminar
-        tareasListView.setOnItemLongClickListener { _, _, position, _ ->
-            val tarea = tareas[position]
-            AlertDialog.Builder(this)
-                .setTitle("Eliminar tarea")
-                .setMessage("¿Seguro deseas eliminar la tarea '${tarea.Titulo}'?")
-                .setPositiveButton("Eliminar") { _, _ ->
-                    dbHelper.deleteTarea(tarea.TareaId)
-                    cargarTareas()
-                }
-                .setNegativeButton("Cancelar", null)
-                .show()
-            true
-        }
     }
 
     private fun cargarTareas() {
-        tareas = dbHelper.getAllTareas()
-        val titulos = tareas.map { "${it.Titulo} (${it.Estado})" }
-        adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, titulos)
+        tareas = dbHelper.getAllTareas().toMutableList()
+        adapter = TareaAdapter(
+            this,
+            tareas,
+            onEditar = { tarea -> mostrarDialogoAgregar(tarea) },
+            onEliminar = { tarea -> mostrarDialogoEliminar(tarea) }
+        )
         tareasListView.adapter = adapter
     }
 
@@ -75,20 +57,36 @@ class TareasActivity : AppCompatActivity() {
             .setPositiveButton("Guardar") { _, _ ->
                 val nuevoTitulo = etTitulo.text.toString()
                 val nuevaDescripcion = etDescripcion.text.toString()
-                if (tarea == null) {
-                    val nuevaTarea = Tarea(
-                        ApunteId = 1,
-                        Titulo = nuevoTitulo,
-                        Descripcion = nuevaDescripcion,
-                        Estado = "Pendiente",
-                        Fecha = Date()
-                    )
-                    dbHelper.insertTarea(nuevaTarea)
+                if (nuevoTitulo.isNotBlank()) {
+                    if (tarea == null) {
+                        val nuevaTarea = Tarea(
+                            ApunteId = 1, // Cambia esto si necesitas otro ApunteId
+                            Titulo = nuevoTitulo,
+                            Descripcion = nuevaDescripcion,
+                            Estado = "Pendiente",
+                            Fecha = Date()
+                        )
+                        dbHelper.insertTarea(nuevaTarea)
+                    } else {
+                        tarea.Titulo = nuevoTitulo
+                        tarea.Descripcion = nuevaDescripcion
+                        dbHelper.updateTarea(tarea)
+                    }
+                    cargarTareas()
                 } else {
-                    tarea.Titulo = nuevoTitulo
-                    tarea.Descripcion = nuevaDescripcion
-                    dbHelper.updateTarea(tarea)
+                    Toast.makeText(this, "El título no puede estar vacío", Toast.LENGTH_SHORT).show()
                 }
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    private fun mostrarDialogoEliminar(tarea: Tarea) {
+        AlertDialog.Builder(this)
+            .setTitle("Eliminar tarea")
+            .setMessage("¿Seguro deseas eliminar la tarea '${tarea.Titulo}'?")
+            .setPositiveButton("Eliminar") { _, _ ->
+                dbHelper.deleteTarea(tarea.TareaId)
                 cargarTareas()
             }
             .setNegativeButton("Cancelar", null)
