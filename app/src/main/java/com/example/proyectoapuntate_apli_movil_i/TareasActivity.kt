@@ -1,6 +1,8 @@
 package com.example.proyectoapuntate_apli_movil_i
 
+import android.app.AlertDialog
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.example.proyectoapuntate_apli_movil_i.database.DBHelper
@@ -20,22 +22,32 @@ class TareasActivity : AppCompatActivity() {
         dbHelper = DBHelper(this)
         tareasListView = findViewById(R.id.listViewTareas)
 
-        // Mostrar todas las tareas
         cargarTareas()
 
-        // Botón para agregar tarea (deberías tener un botón en tu layout)
         val btnAgregar = findViewById<Button>(R.id.btnAgregarTarea)
         btnAgregar.setOnClickListener {
-            // Aquí puedes abrir un diálogo o una nueva pantalla para agregar una tarea
-            agregarTareaDemo()
-            cargarTareas()
+            mostrarDialogoAgregar(null)
         }
 
-        // Puedes agregar listeners para editar/eliminar tareas aquí
+        // Click corto: editar
         tareasListView.setOnItemClickListener { _, _, position, _ ->
             val tarea = tareas[position]
-            // Aquí puedes abrir una pantalla para editar/eliminar la tarea seleccionada
-            Toast.makeText(this, "Seleccionaste: ${tarea.Titulo}", Toast.LENGTH_SHORT).show()
+            mostrarDialogoAgregar(tarea)
+        }
+
+        // Click largo: eliminar
+        tareasListView.setOnItemLongClickListener { _, _, position, _ ->
+            val tarea = tareas[position]
+            AlertDialog.Builder(this)
+                .setTitle("Eliminar tarea")
+                .setMessage("¿Seguro deseas eliminar la tarea '${tarea.Titulo}'?")
+                .setPositiveButton("Eliminar") { _, _ ->
+                    dbHelper.deleteTarea(tarea.TareaId)
+                    cargarTareas()
+                }
+                .setNegativeButton("Cancelar", null)
+                .show()
+            true
         }
     }
 
@@ -46,15 +58,40 @@ class TareasActivity : AppCompatActivity() {
         tareasListView.adapter = adapter
     }
 
-    private fun agregarTareaDemo() {
-        // Esto es solo un ejemplo, deberías mostrar un form para ingresar datos reales
-        val nuevaTarea = Tarea(
-            ApunteId = 1, // Cambia esto por el ApunteId real
-            Titulo = "Nueva tarea",
-            Descripcion = "Descripción de la tarea",
-            Estado = "Pendiente",
-            Fecha = Date()
-        )
-        dbHelper.insertTarea(nuevaTarea)
+    // Mostrar Dialog para agregar o editar tarea
+    private fun mostrarDialogoAgregar(tarea: Tarea?) {
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_tarea, null)
+        val etTitulo = dialogView.findViewById<EditText>(R.id.etTitulo)
+        val etDescripcion = dialogView.findViewById<EditText>(R.id.etDescripcion)
+
+        if (tarea != null) {
+            etTitulo.setText(tarea.Titulo)
+            etDescripcion.setText(tarea.Descripcion)
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle(if (tarea == null) "Agregar tarea" else "Editar tarea")
+            .setView(dialogView)
+            .setPositiveButton("Guardar") { _, _ ->
+                val nuevoTitulo = etTitulo.text.toString()
+                val nuevaDescripcion = etDescripcion.text.toString()
+                if (tarea == null) {
+                    val nuevaTarea = Tarea(
+                        ApunteId = 1,
+                        Titulo = nuevoTitulo,
+                        Descripcion = nuevaDescripcion,
+                        Estado = "Pendiente",
+                        Fecha = Date()
+                    )
+                    dbHelper.insertTarea(nuevaTarea)
+                } else {
+                    tarea.Titulo = nuevoTitulo
+                    tarea.Descripcion = nuevaDescripcion
+                    dbHelper.updateTarea(tarea)
+                }
+                cargarTareas()
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
     }
 }
