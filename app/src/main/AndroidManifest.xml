@@ -16,6 +16,9 @@
             android:name=".HomeActivity"
             android:exported="false" />
         <activity
+            android:name=".NotasActivity"
+            android:exported="false" />
+        <activity
             android:name=".RegistroActivity"
             android:exported="false" />
         <activity

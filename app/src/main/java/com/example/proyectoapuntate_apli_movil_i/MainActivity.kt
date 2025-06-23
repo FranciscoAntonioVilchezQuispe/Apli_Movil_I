@@ -19,11 +19,17 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
         val BRegistrar=findViewById<Button>(R.id.btRegistrar)
+        val btnIngresar=findViewById<Button>(R.id.btIngresar)
 
 
         val dbHelper = DBHelper(this)
         BRegistrar.setOnClickListener{
             val intent= Intent(this,RegistroActivity::class.java)
+            startActivity(intent)
+        }
+
+        btnIngresar.setOnClickListener{
+            val intent= Intent(this,NotasActivity::class.java)
             startActivity(intent)
         }
         val btnTareas = findViewById<Button>(R.id.btnTareas)
