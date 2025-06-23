@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -18,7 +19,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
-        val BRegistrar=findViewById<Button>(R.id.btRegistrar)
+        val BRegistrar=findViewById<TextView>(R.id.tvRegistrar)
         val btnIngresar=findViewById<Button>(R.id.btIngresar)
 
 
@@ -28,15 +29,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        btnIngresar.setOnClickListener{
-            val intent= Intent(this,NotasActivity::class.java)
-            startActivity(intent)
-        }
-        val btnTareas = findViewById<Button>(R.id.btnTareas)
-        btnTareas.setOnClickListener {
-            val intent = Intent(this, TareasActivity::class.java)
-            startActivity(intent)
-        }
+
         btnIngresar.setOnClickListener {
             val documento=findViewById<EditText>(R.id.etDocumento).text.toString()
             val clave=findViewById<EditText>(R.id.etContrasena).text.toString()
@@ -55,6 +48,7 @@ var cliente:Cliente
                 return@setOnClickListener
             }
             val intent = Intent(this, HomeActivity::class.java)
+            intent.putExtra("USER_ID", login.IdLogin.toString())
             startActivity(intent)
         }
     }

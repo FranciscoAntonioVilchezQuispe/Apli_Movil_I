@@ -9,4 +9,8 @@
     <color name="button_pressed">#3F51B5</color>
     <color name="custom_purple" />
     <color name="progress_bar_fill" />
+    <color name="primary_color">#6200EE</color>
+    <color name="primary_dark">#3700B3</color>
+    <color name="secondary_color">#03DAC6</color>
+    <color name="secondary_text">#757575</color>
 </resources>

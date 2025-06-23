@@ -13,11 +13,12 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var btnTarea: AppCompatButton
     private lateinit var btnApunte: AppCompatButton
     private lateinit var btnVerPerfil: AppCompatButton
-
+    private var userId: String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
-
+        // Recibir el ID del usuario desde Login
+        userId = intent.getStringExtra("USER_ID")
         initViews()
         setupClickListeners()
     }
@@ -40,9 +41,10 @@ class HomeActivity : AppCompatActivity() {
         }
 
         btnVerPerfil.setOnClickListener {
-            // Navegar a la pantalla de Perfil
-            Toast.makeText(this, "Navegando a Perfil", Toast.LENGTH_SHORT).show()
-            // startActivity(Intent(this, PerfilActivity::class.java))
+            val intent = Intent(this, RegistroActivity::class.java)
+            intent.putExtra("USER_ID", userId) // Enviar ID del usuario
+            intent.putExtra("IS_VIEW_MODE", true) // Modo visualización
+            startActivity(intent)
         }
     }
 }
