@@ -11,8 +11,8 @@ import com.example.proyectoapuntate_apli_movil_i.Entidades.Notas
 
 class NotasAdapter(
     private var notas: List<Notas>,
-    private val onEditClick: (Notas) -> Unit,       // Callback para editar
-    private val onDeleteClick: (Notas) -> Unit      // Callback para eliminar
+    private val onEditClick: (Notas) -> Unit,
+    private val onDeleteClick: (Notas) -> Unit
 ) : RecyclerView.Adapter<NotasAdapter.NotaViewHolder>() {
 
     class NotaViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -33,12 +33,10 @@ class NotasAdapter(
         holder.progressBarNota.progress = nota.progreso
         holder.textViewProgreso.text = "${nota.progreso}%"
 
-        // Configurar listener para el menú de opciones
         holder.imageViewMenuNota.setOnClickListener {
-            // Pasamos la nota completa al callback para que la Activity pueda manejarla
             val context = holder.itemView.context
             val popupMenu = android.widget.PopupMenu(context, holder.imageViewMenuNota)
-            popupMenu.menuInflater.inflate(R.menu.nota_item_menu, popupMenu.menu) // Crea este menú
+            popupMenu.menuInflater.inflate(R.menu.nota_item_menu, popupMenu.menu)
             popupMenu.setOnMenuItemClickListener { menuItem ->
                 when (menuItem.itemId) {
                     R.id.action_edit_note -> {
