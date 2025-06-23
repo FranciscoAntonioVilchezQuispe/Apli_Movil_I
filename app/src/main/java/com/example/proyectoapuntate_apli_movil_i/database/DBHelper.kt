@@ -17,7 +17,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class DBHelper(context: Context) : SQLiteOpenHelper(context, "BdApuntes.db", null, 3) {
+class DBHelper(context: Context) : SQLiteOpenHelper(context, "BdApuntes.db", null, 4) {
     companion object {
         private const val DATABASE_NAME = "AppDatabase.db"
         private const val DATABASE_VERSION = 1
@@ -661,8 +661,34 @@ class DBHelper(context: Context) : SQLiteOpenHelper(context, "BdApuntes.db", nul
         db.close()
         return newRowId
     }
-
     fun obtenerTodasLasNotas(): List<Notas> {
+        val listaNotas = mutableListOf<Notas>()
+
+        return try {
+            val db = readableDatabase
+            val cursor = db.rawQuery("SELECT * FROM $TABLE_NOTAS", null)
+
+            cursor.use { c ->
+                if (c.moveToFirst()) {
+                    do {
+                        val id = c.getInt(c.getColumnIndexOrThrow(COLUMN_ID_NOTAS))
+                        val titulo = c.getString(c.getColumnIndexOrThrow(COLUMN_TITULO_NOTAS))
+                        val progreso = c.getInt(c.getColumnIndexOrThrow(COLUMN_PROGRESO_NOTAS))
+
+                        listaNotas.add(Notas(id, titulo, progreso))
+                    } while (c.moveToNext())
+                }
+            }
+
+            db.close()
+            listaNotas
+
+        } catch (e:Exception ) {
+            Log.e("DatabaseError", "Error al obtener notas: ${e.message}", e)
+            emptyList()
+        }
+    }
+    fun obtenerTodasLasNotas_old(): List<Notas> {
         val listaNotas = mutableListOf<Notas>()
         val db = readableDatabase
         val cursor = db.rawQuery("SELECT * FROM $TABLE_NOTAS", null)

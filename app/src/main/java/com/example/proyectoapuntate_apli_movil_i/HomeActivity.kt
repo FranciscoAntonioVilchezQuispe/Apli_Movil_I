@@ -35,9 +35,8 @@ class HomeActivity : AppCompatActivity() {
         }
 
         btnApunte.setOnClickListener {
-            // Navegar a la pantalla de Apuntes
-            Toast.makeText(this, "Navegando a Apuntes", Toast.LENGTH_SHORT).show()
-            // startActivity(Intent(this, ApunteActivity::class.java))
+            val intent = Intent(this, NotasActivity::class.java)
+            startActivity(intent)
         }
 
         btnVerPerfil.setOnClickListener {

@@ -37,7 +37,6 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, TareasActivity::class.java)
             startActivity(intent)
         }
-        val btnIngresar = findViewById<Button>(R.id.btIngresar)
         btnIngresar.setOnClickListener {
             val documento=findViewById<EditText>(R.id.etDocumento).text.toString()
             val clave=findViewById<EditText>(R.id.etContrasena).text.toString()
