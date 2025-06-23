@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper
 import com.example.proyectoapuntate_apli_movil_i.Entidades.Apunte
 import com.example.proyectoapuntate_apli_movil_i.Entidades.Cliente
 import com.example.proyectoapuntate_apli_movil_i.Entidades.Login
+import com.example.proyectoapuntate_apli_movil_i.Entidades.Notas
 import com.example.proyectoapuntate_apli_movil_i.Entidades.Tarea
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -50,6 +51,12 @@ class DBHelper(context: Context):SQLiteOpenHelper(context,"BdApuntes.db",null,1)
         private const val COL_DESCRIPCION_TAREA = "Descripcion"
         private const val COL_ESTADO = "Estado"
         private const val COL_FECHA_TAREA = "Fecha"
+
+        //Tabla notas
+        private const val TABLE_NOTAS = "notas"
+        private const val COLUMN_ID_NOTAS = "id"
+        private const val COLUMN_TITULO_NOTAS = "titulo"
+        private const val COLUMN_PROGRESO_NOTAS = "progreso"
     }
 
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
@@ -104,6 +111,16 @@ class DBHelper(context: Context):SQLiteOpenHelper(context,"BdApuntes.db",null,1)
             )
         """.trimIndent()
 
+
+        val createTableNotas = """
+            CREATE TABLE $TABLE_NOTAS (
+                $COLUMN_ID_NOTAS INTEGER PRIMARY KEY AUTOINCREMENT,
+                $COLUMN_TITULO_NOTAS TEXT,
+                $COLUMN_PROGRESO_NOTAS INTEGER
+            )
+        """
+        db?.execSQL(createTableNotas)
+
         db?.execSQL(createClienteTable)
         db?.execSQL(createLoginTable)
         db?.execSQL(createApunteTable)
@@ -115,6 +132,8 @@ class DBHelper(context: Context):SQLiteOpenHelper(context,"BdApuntes.db",null,1)
         db?.execSQL("DROP TABLE IF EXISTS $TABLE_APUNTE")
         db?.execSQL("DROP TABLE IF EXISTS $TABLE_LOGIN")
         db?.execSQL("DROP TABLE IF EXISTS $TABLE_CLIENTE")
+        db?.execSQL("DROP TABLE IF EXISTS $TABLE_NOTAS")
+
         onCreate(db)
 
 
@@ -427,6 +446,54 @@ class DBHelper(context: Context):SQLiteOpenHelper(context,"BdApuntes.db",null,1)
         val result = db.delete(TABLE_TAREA, "$COL_TAREA_ID = ?", arrayOf(id.toString()))
         db.close()
         return result
+    }
+
+
+    fun insertarNota(nota: Notas): Long {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put(COLUMN_TITULO_NOTAS, nota.titulo)
+            put(COLUMN_PROGRESO_NOTAS, nota.progreso)
+        }
+        val newRowId = db.insert(TABLE_NOTAS, null, values)
+        db.close()
+        return newRowId
+    }
+
+    fun obtenerTodasLasNotas(): List<Notas> {
+        val listaNotas = mutableListOf<Notas>()
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM $TABLE_NOTAS", null)
+
+        if (cursor.moveToFirst()) {
+            do {
+                val id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID_NOTAS))
+                val titulo = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TITULO_NOTAS))
+                val progreso = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_PROGRESO_NOTAS))
+                listaNotas.add(Notas(id, titulo, progreso))
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
+        db.close()
+        return listaNotas
+    }
+
+    fun actualizarNota(nota: Notas): Int {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put(COLUMN_TITULO_NOTAS, nota.titulo)
+            put(COLUMN_PROGRESO_NOTAS, nota.progreso)
+        }
+        val rowsAffected = db.update(TABLE_NOTAS, values, "$COLUMN_ID_NOTAS = ?", arrayOf(nota.id.toString()))
+        db.close()
+        return rowsAffected
+    }
+
+    fun eliminarNota(id: Int): Int {
+        val db = writableDatabase
+        val rowsAffected = db.delete(TABLE_NOTAS, "$COLUMN_ID_NOTAS = ?", arrayOf(id.toString()))
+        db.close()
+        return rowsAffected
     }
 
 }
