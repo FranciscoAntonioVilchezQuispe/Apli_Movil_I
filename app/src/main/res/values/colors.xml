@@ -2,4 +2,6 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-</resources>
+    <color name="custom_purple">#673AB7</color> <color name="text_pink">#E91E63</color> <color name="background_light_grey">#F0F0F0</color> <color name="card_background">#FFFFFF</color> <color name="button_orange">#FF9800</color> <color name="button_green">#8BC34A</color> <color name="edittext_border">#CCCCCC</color> <color name="progress_bar_fill">#8BC34A</color> <color name="add_button_bg">#E0F7FA</color> <color name="add_button_border">#4DD0E1</color>
+
+    </resources>
