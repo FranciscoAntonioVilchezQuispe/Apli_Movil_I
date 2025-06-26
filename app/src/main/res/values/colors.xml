@@ -12,5 +12,11 @@
     <color name="primary_color">#6200EE</color>
     <color name="primary_dark">#3700B3</color>
     <color name="secondary_color">#03DAC6</color>
+    <color name="background_light_grey">#F0F0F0</color>
+    <color name="card_background">#FFFFFF</color>
+    <color name="button_green">#8BC34A</color>
+    <color name="add_button_bg">#E0F7FA</color>
+    <color name="add_button_border">#4DD0E1</color>
+    <color name="edittext_border">#CCCCCC</color>
     <color name="secondary_text">#757575</color>
 </resources>
