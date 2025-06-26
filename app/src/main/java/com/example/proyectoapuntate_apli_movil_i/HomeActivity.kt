@@ -37,6 +37,7 @@ class HomeActivity : AppCompatActivity() {
 
         btnApunte.setOnClickListener {
             val intent = Intent(this, NotasActivity::class.java)
+            intent.putExtra("USER_ID", userId) // Enviar ID del usuario
             startActivity(intent)
         }
 

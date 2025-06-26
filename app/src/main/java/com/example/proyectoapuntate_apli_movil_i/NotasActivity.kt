@@ -8,7 +8,6 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,6 +16,7 @@ import com.example.proyectoapuntate_apli_movil_i.Entidades.Notas
 import com.example.proyectoapuntate_apli_movil_i.database.DBHelper
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
+import java.util.Date
 
 class NotasActivity : AppCompatActivity() {
     private lateinit var recyclerViewNotas: RecyclerView
@@ -25,12 +25,16 @@ class NotasActivity : AppCompatActivity() {
     private lateinit var imageViewNotification: ImageView
     private lateinit var buttonAddNota: Button
     private lateinit var bottomNavigationView: BottomNavigationView
+    //private var userId: String? = null
+    //private var iUserId: Int? = null
 
     private lateinit var notasDBHelper: DBHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_notas)
+       // userId = intent.getStringExtra("USER_ID")
+      //  iUserId = userId?.toIntOrNull()
 
         notasDBHelper = DBHelper(this)
 
@@ -65,7 +69,6 @@ class NotasActivity : AppCompatActivity() {
                 else -> false
             }
         }
-        bottomNavigationView.selectedItemId = R.id.navigation_home
 
         editTextBuscarNotas.addTextChangedListener(object : android.text.TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -137,7 +140,8 @@ class NotasActivity : AppCompatActivity() {
                             Snackbar.make(findViewById(android.R.id.content), "Nota '$titulo' agregada.", Snackbar.LENGTH_SHORT).show()
                             loadNotas()
                         } else {
-                            Snackbar.make(findViewById(android.R.id.content), "Error al agregar nota.", Snackbar.LENGTH_SHORT).show()
+                            Snackbar.make(findViewById(android.R.id.content),
+                                "Error al agregar nota.$nuevaNota", Snackbar.LENGTH_SHORT).show()
                         }
                     } else {
                         val notaActualizada = Notas(notaToEdit.id, titulo, progreso)

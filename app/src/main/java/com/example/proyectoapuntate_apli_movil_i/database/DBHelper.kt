@@ -7,7 +7,6 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
-import com.example.proyectoapuntate_apli_movil_i.Entidades.Apunte
 import com.example.proyectoapuntate_apli_movil_i.Entidades.Cliente
 import com.example.proyectoapuntate_apli_movil_i.Entidades.Login
 import com.example.proyectoapuntate_apli_movil_i.Entidades.Notas
@@ -41,14 +40,7 @@ class DBHelper(context: Context) : SQLiteOpenHelper(context, "BdApuntes.db", nul
         private const val COL_CLAVE = "Clave"
         private const val COL_FECHA_LOGIN = "Fecha"
 
-        // Tabla Apunte
-        private const val TABLE_APUNTE = "Apunte"
-        private const val COL_APUNTE_ID = "ApunteId"
-        private const val COL_CLIENTE_ID = "ClienteId"
-        private const val COL_TITULO_APUNTE = "Titulo"
-        private const val COL_DESCRIPCION_APUNTE = "Descripcion"
-        private const val COL_PORCENTAJE = "Porcentaje"
-        private const val COL_FECHA_APUNTE = "Fecha"
+
 
         // Tabla Tarea
         private const val TABLE_TAREA = "Tarea"
@@ -69,6 +61,8 @@ class DBHelper(context: Context) : SQLiteOpenHelper(context, "BdApuntes.db", nul
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
 
     override fun onCreate(db: SQLiteDatabase?) {
+
+
         // Crear tabla Cliente
         val createClienteTable = """
             CREATE TABLE $TABLE_CLIENTE (
@@ -95,18 +89,6 @@ class DBHelper(context: Context) : SQLiteOpenHelper(context, "BdApuntes.db", nul
             )
         """.trimIndent()
 
-        // Crear tabla Apunte
-        val createApunteTable = """
-            CREATE TABLE $TABLE_APUNTE (
-                $COL_APUNTE_ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                $COL_CLIENTE_ID INTEGER,
-                $COL_TITULO_APUNTE TEXT NOT NULL,
-                $COL_DESCRIPCION_APUNTE TEXT,
-                $COL_PORCENTAJE REAL DEFAULT 0.0,
-                $COL_FECHA_APUNTE TEXT,
-                FOREIGN KEY($COL_CLIENTE_ID) REFERENCES $TABLE_CLIENTE($COL_ID_CLIENTE)
-            )
-        """.trimIndent()
 
         // Crear tabla Tarea
         val createTareaTable = """
@@ -116,8 +98,7 @@ class DBHelper(context: Context) : SQLiteOpenHelper(context, "BdApuntes.db", nul
                 $COL_TITULO_TAREA TEXT NOT NULL,
                 $COL_DESCRIPCION_TAREA TEXT,
                 $COL_ESTADO TEXT,
-                $COL_FECHA_TAREA TEXT,
-                FOREIGN KEY($COL_APUNTE_ID_TAREA) REFERENCES $TABLE_APUNTE($COL_APUNTE_ID)
+                $COL_FECHA_TAREA TEXT
             )
         """.trimIndent()
 
@@ -128,22 +109,21 @@ class DBHelper(context: Context) : SQLiteOpenHelper(context, "BdApuntes.db", nul
                 $COLUMN_TITULO_NOTAS TEXT,
                 $COLUMN_PROGRESO_NOTAS INTEGER
             )
-        """
+        """.trimIndent()
+
         db?.execSQL(createTableNotas)
 
         db?.execSQL(createClienteTable)
         db?.execSQL(createLoginTable)
-        db?.execSQL(createApunteTable)
         db?.execSQL(createTareaTable)
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
 
         db?.execSQL("DROP TABLE IF EXISTS $TABLE_TAREA")
-        db?.execSQL("DROP TABLE IF EXISTS $TABLE_APUNTE")
         db?.execSQL("DROP TABLE IF EXISTS $TABLE_LOGIN")
         db?.execSQL("DROP TABLE IF EXISTS $TABLE_CLIENTE")
-        db?.execSQL("DROP TABLE IF EXISTS $TABLE_NOTAS")
+     //   db?.execSQL("DROP TABLE IF EXISTS $TABLE_NOTAS")
 
         onCreate(db)
 
@@ -421,108 +401,6 @@ class DBHelper(context: Context) : SQLiteOpenHelper(context, "BdApuntes.db", nul
         return logins
     }
 
-    // MÉTODOS PARA APUNTE
-    fun insertApunte(apunte: Apunte): Long {
-        val db = writableDatabase
-        val values = ContentValues().apply {
-            put(COL_CLIENTE_ID, apunte.ClienteId)
-            put(COL_TITULO_APUNTE, apunte.Titulo)
-            put(COL_DESCRIPCION_APUNTE, apunte.Descripcion)
-            put(COL_PORCENTAJE, apunte.Porcentaje)
-            put(COL_FECHA_APUNTE, dateFormat.format(apunte.Fecha))
-        }
-        val result = db.insert(TABLE_APUNTE, null, values)
-        db.close()
-        return result
-    }
-
-    fun updateApunte(apunte: Apunte): Int {
-        val db = writableDatabase
-        val values = ContentValues().apply {
-            put(COL_CLIENTE_ID, apunte.ClienteId)
-            put(COL_TITULO_APUNTE, apunte.Titulo)
-            put(COL_DESCRIPCION_APUNTE, apunte.Descripcion)
-            put(COL_PORCENTAJE, apunte.Porcentaje)
-            put(COL_FECHA_APUNTE, dateFormat.format(apunte.Fecha))
-        }
-        val result = db.update(
-            TABLE_APUNTE,
-            values,
-            "$COL_APUNTE_ID = ?",
-            arrayOf(apunte.ApunteId.toString())
-        )
-        db.close()
-        return result
-    }
-
-    fun getApunteById(id: Int): Apunte? {
-        val db = readableDatabase
-        val cursor = db.query(
-            TABLE_APUNTE,
-            null,
-            "$COL_APUNTE_ID = ?",
-            arrayOf(id.toString()),
-            null,
-            null,
-            null
-        )
-
-        var apunte: Apunte? = null
-        if (cursor.moveToFirst()) {
-            apunte = Apunte(
-                ApunteId = cursor.getInt(cursor.getColumnIndexOrThrow(COL_APUNTE_ID)),
-                ClienteId = cursor.getInt(cursor.getColumnIndexOrThrow(COL_CLIENTE_ID)),
-                Titulo = cursor.getString(cursor.getColumnIndexOrThrow(COL_TITULO_APUNTE)),
-                Descripcion = cursor.getString(cursor.getColumnIndexOrThrow(COL_DESCRIPCION_APUNTE))
-                    ?: "",
-                Porcentaje = cursor.getDouble(cursor.getColumnIndexOrThrow(COL_PORCENTAJE)),
-                Fecha = dateFormat.parse(
-                    cursor.getString(
-                        cursor.getColumnIndexOrThrow(
-                            COL_FECHA_APUNTE
-                        )
-                    )
-                ) ?: Date()
-            )
-        }
-        cursor.close()
-        db.close()
-        return apunte
-    }
-
-    fun getAllApuntes(): List<Apunte> {
-        val apuntes = mutableListOf<Apunte>()
-        val db = readableDatabase
-        val cursor = db.query(TABLE_APUNTE, null, null, null, null, null, null)
-
-        if (cursor.moveToFirst()) {
-            do {
-                val apunte = Apunte(
-                    ApunteId = cursor.getInt(cursor.getColumnIndexOrThrow(COL_APUNTE_ID)),
-                    ClienteId = cursor.getInt(cursor.getColumnIndexOrThrow(COL_CLIENTE_ID)),
-                    Titulo = cursor.getString(cursor.getColumnIndexOrThrow(COL_TITULO_APUNTE)),
-                    Descripcion = cursor.getString(
-                        cursor.getColumnIndexOrThrow(
-                            COL_DESCRIPCION_APUNTE
-                        )
-                    ) ?: "",
-                    Porcentaje = cursor.getDouble(cursor.getColumnIndexOrThrow(COL_PORCENTAJE)),
-                    Fecha = dateFormat.parse(
-                        cursor.getString(
-                            cursor.getColumnIndexOrThrow(
-                                COL_FECHA_APUNTE
-                            )
-                        )
-                    ) ?: Date()
-                )
-                apuntes.add(apunte)
-            } while (cursor.moveToNext())
-        }
-        cursor.close()
-        db.close()
-        return apuntes
-    }
-
     // MÉTODOS PARA TAREA
     fun insertTarea(tarea: Tarea): Long {
         val db = writableDatabase
@@ -636,12 +514,6 @@ class DBHelper(context: Context) : SQLiteOpenHelper(context, "BdApuntes.db", nul
         return result
     }
 
-    fun deleteApunte(id: Int): Int {
-        val db = writableDatabase
-        val result = db.delete(TABLE_APUNTE, "$COL_APUNTE_ID = ?", arrayOf(id.toString()))
-        db.close()
-        return result
-    }
 
     fun deleteTarea(id: Int): Int {
         val db = writableDatabase
